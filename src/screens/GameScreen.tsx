@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useGameStore, WRONG_ANSWER_PENALTY } from "../store/gameStore";
 import { MiddleEarthMap } from "../components/MiddleEarthMap";
@@ -13,6 +14,14 @@ export function GameScreen() {
 
   return (
     <main className="min-h-screen px-4 md:px-8 py-6 max-w-6xl mx-auto flex flex-col gap-6">
+      {/* Top bar */}
+      <div className="flex items-center justify-between gap-3">
+        <span className="font-display tracking-[0.25em] text-bronze text-xs md:text-sm uppercase">
+          Middle-earth Trivia
+        </span>
+        <RestartControl />
+      </div>
+
       {/* Scoreboard */}
       <div className="grid grid-cols-2 gap-4">
         {teams.map((team, i) => (
@@ -52,6 +61,52 @@ function stageMotion(children: React.ReactNode) {
     >
       {children}
     </motion.div>
+  );
+}
+
+function RestartControl() {
+  const startGame = useGameStore((s) => s.startGame);
+  const resetGame = useGameStore((s) => s.resetGame);
+  const [confirming, setConfirming] = useState(false);
+
+  if (!confirming) {
+    return (
+      <button
+        onClick={() => setConfirming(true)}
+        className="btn-rune rounded-lg px-4 py-2 text-sm"
+      >
+        ↺ Restart
+      </button>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-2 panel-dark rounded-lg px-3 py-2">
+      <span className="text-parchment/80 text-sm hidden sm:inline">
+        Reset the quest?
+      </span>
+      <button
+        onClick={() => {
+          startGame();
+          setConfirming(false);
+        }}
+        className="btn-gold rounded-lg px-3 py-1.5 text-sm"
+      >
+        Restart
+      </button>
+      <button
+        onClick={resetGame}
+        className="btn-rune rounded-lg px-3 py-1.5 text-sm"
+      >
+        Quit to title
+      </button>
+      <button
+        onClick={() => setConfirming(false)}
+        className="btn-rune rounded-lg px-3 py-1.5 text-sm"
+      >
+        Cancel
+      </button>
+    </div>
   );
 }
 
