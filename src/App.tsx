@@ -4,6 +4,7 @@ import { HomeScreen } from "./screens/HomeScreen";
 import { SetupScreen } from "./screens/SetupScreen";
 import { GameScreen } from "./screens/GameScreen";
 import { VictoryScreen } from "./screens/VictoryScreen";
+import { MusicPlayer } from "./components/MusicPlayer";
 
 export default function App() {
   const phase = useGameStore((s) => s.phase);
@@ -25,6 +26,8 @@ export default function App() {
           {phase === "victory" && <VictoryScreen />}
         </motion.div>
       </AnimatePresence>
+
+      <MusicPlayer />
     </div>
   );
 }
