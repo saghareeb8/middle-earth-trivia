@@ -27,3 +27,9 @@ pnpm-debug.log*
 
 # Vite / PWA generated (regenerated on build)
 dev-dist/
+
+# TypeScript incremental build info
+*.tsbuildinfo
+
+# Local Claude settings (machine-specific)
+.claude/settings.local.json
