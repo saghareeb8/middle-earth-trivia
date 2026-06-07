@@ -1,0 +1,140 @@
+@import "tailwindcss";
+
+/* ── Middle-earth theme tokens ───────────────────────────────────────── */
+@theme {
+  --font-display: "Cinzel", serif;
+  --font-body: "EB Garamond", "Georgia", serif;
+
+  /* Parchment & ink */
+  --color-parchment: #e9d8b4;
+  --color-parchment-dark: #d8c191;
+  --color-ink: #2a1d0e;
+
+  /* Deep backgrounds (night in Middle-earth) */
+  --color-night: #1b1407;
+  --color-night-light: #2a2012;
+  --color-bark: #3a2c17;
+
+  /* Metals & accents */
+  --color-gold: #c8a24a;
+  --color-gold-bright: #e7c878;
+  --color-bronze: #8a6a2f;
+  --color-ember: #d4642a;
+
+  /* Team colours */
+  --color-team-blue: #4a7fb5;
+  --color-team-red: #b5494a;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-body);
+    color: var(--color-parchment);
+    background-color: var(--color-night);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family: var(--font-display);
+    letter-spacing: 0.02em;
+  }
+}
+
+/* ── Reusable Middle-earth flavoured utilities ──────────────────────────*/
+@layer components {
+  /* Glowing gold heading text */
+  .text-gilded {
+    color: var(--color-gold-bright);
+    text-shadow: 0 0 14px rgba(231, 200, 120, 0.35), 0 2px 4px rgba(0, 0, 0, 0.6);
+  }
+
+  /* A weathered parchment surface */
+  .panel-parchment {
+    background:
+      radial-gradient(
+        ellipse at top,
+        rgba(255, 255, 255, 0.08),
+        transparent 60%
+      ),
+      linear-gradient(160deg, var(--color-parchment), var(--color-parchment-dark));
+    color: var(--color-ink);
+    border: 1px solid var(--color-bronze);
+    box-shadow:
+      0 0 0 1px rgba(0, 0, 0, 0.25),
+      0 18px 40px rgba(0, 0, 0, 0.55),
+      inset 0 0 60px rgba(120, 80, 30, 0.18);
+  }
+
+  /* A dark, carved wood/stone surface */
+  .panel-dark {
+    background: linear-gradient(160deg, var(--color-night-light), var(--color-night));
+    border: 1px solid var(--color-bronze);
+    box-shadow:
+      inset 0 1px 0 rgba(231, 200, 120, 0.12),
+      0 14px 36px rgba(0, 0, 0, 0.6);
+  }
+
+  /* Gold ring-styled primary button */
+  .btn-gold {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--color-ink);
+    background: linear-gradient(180deg, var(--color-gold-bright), var(--color-gold) 55%, var(--color-bronze));
+    border: 1px solid var(--color-gold-bright);
+    box-shadow:
+      0 0 18px rgba(231, 200, 120, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    transition: transform 0.12s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  }
+  .btn-gold:hover:not(:disabled) {
+    filter: brightness(1.08);
+    box-shadow: 0 0 26px rgba(231, 200, 120, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+  .btn-gold:active:not(:disabled) {
+    transform: translateY(1px) scale(0.99);
+  }
+  .btn-gold:disabled {
+    filter: grayscale(0.6) brightness(0.7);
+    cursor: not-allowed;
+  }
+
+  /* Outlined secondary button */
+  .btn-rune {
+    font-family: var(--font-display);
+    letter-spacing: 0.06em;
+    color: var(--color-gold-bright);
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--color-bronze);
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+  .btn-rune:hover:not(:disabled) {
+    background: rgba(200, 162, 74, 0.14);
+    border-color: var(--color-gold);
+    color: var(--color-gold-bright);
+  }
+  .btn-rune:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+/* Slow ember flicker for the Mount Doom marker, etc. */
+@keyframes ember-flicker {
+  0%, 100% { opacity: 0.85; filter: drop-shadow(0 0 6px var(--color-ember)); }
+  50% { opacity: 1; filter: drop-shadow(0 0 16px var(--color-ember)); }
+}
+.animate-ember {
+  animation: ember-flicker 2.4s ease-in-out infinite;
+}
