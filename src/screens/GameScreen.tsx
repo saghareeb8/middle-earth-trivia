@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useGameStore, WRONG_ANSWER_PENALTY } from "../store/gameStore";

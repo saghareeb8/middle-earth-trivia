@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { useGameStore } from "../store/gameStore";
 import type { Team } from "../types";
@@ -8,10 +10,29 @@ export function SetupScreen() {
   const teams = useGameStore((s) => s.teams);
   const winningScore = useGameStore((s) => s.winningScore);
   const setWinningScore = useGameStore((s) => s.setWinningScore);
+  const setQuestions = useGameStore((s) => s.setQuestions);
   const startGame = useGameStore((s) => s.startGame);
   const resetGame = useGameStore((s) => s.resetGame);
 
+  const [loading, setLoading] = useState(false);
+
   const canStart = teams.every((t) => t.name.trim().length > 0);
+
+  // Pull a fresh batch of questions from OpenTDB (via our API route), then
+  // begin. If anything fails, the store keeps the bundled bank as a fallback.
+  const handleStart = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/questions?amount=30");
+      const data = await res.json();
+      if (Array.isArray(data.questions)) setQuestions(data.questions);
+    } catch {
+      /* keep bundled fallback (already the default pool) */
+    } finally {
+      setLoading(false);
+      startGame();
+    }
+  };
 
   return (
     <main className="min-h-screen px-4 md:px-8 py-10 max-w-6xl mx-auto">
@@ -69,11 +90,11 @@ export function SetupScreen() {
           ← Back
         </button>
         <button
-          onClick={startGame}
-          disabled={!canStart}
+          onClick={handleStart}
+          disabled={!canStart || loading}
           className="btn-gold rounded-xl px-10 py-4 text-xl"
         >
-          Set Out on the Road
+          {loading ? "Summoning questions…" : "Set Out on the Road"}
         </button>
       </div>
       {!canStart && (
