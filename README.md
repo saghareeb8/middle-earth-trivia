@@ -55,12 +55,22 @@ Import the GitHub repo at vercel.com — it auto-detects Next.js, no config need
 `netlify.toml` sets the build command; Netlify auto-installs `@netlify/plugin-nextjs`
 to provide the Next.js server runtime. Connect the repo and deploy.
 
-## Editing the question bank
+## Questions
 
-All questions live in [`src/data/questions.ts`](src/data/questions.ts) as a typed array
-(difficulty, points, prompt, choices, correct index, lore). Points per difficulty are in
-`POINTS_BY_DIFFICULTY`; the random double-points chance and the wrong-answer step-back
-penalty are constants in [`src/store/gameStore.ts`](src/store/gameStore.ts).
+Questions are fetched at game start from the **Open Trivia Database** (General Knowledge,
+multiple choice) through a server-side Next.js API route:
+
+- [`src/app/api/questions/route.ts`](src/app/api/questions/route.ts) — `GET /api/questions?amount=30&category=9`
+- [`src/lib/opentdb.ts`](src/lib/opentdb.ts) — fetches OpenTDB, decodes (url3986), shuffles
+  the choices, and reshapes into the app's `Question` type (difficulty → points).
+
+Fetching server-side avoids CORS and leaves room to add caching/a key later. OpenTDB rate-
+limits to ~1 request / 5s per IP, so the app pulls a whole batch in one call when the
+moderator starts a game. If the fetch fails (offline, rate-limited), it falls back to the
+bundled bank in [`src/data/questions.ts`](src/data/questions.ts) so a game can always start.
+
+Points per difficulty live in `POINTS_BY_DIFFICULTY`; the double-points chance and the
+wrong-answer step-back penalty are constants in [`src/store/gameStore.ts`](src/store/gameStore.ts).
 
 ## Background music
 

@@ -26,7 +26,13 @@ function makeTeam(name: string, color: string): Team {
 // remote changes — no component code needs to change.
 
 interface GameStore extends GameState {
+  /** The active question bank. Loaded from OpenTDB at game start; falls back
+   *  to the bundled set if the fetch fails (e.g. offline). */
+  questionPool: Question[];
+
   // ── Setup actions ──
+  /** Replace the active question bank (and reset which have been used). */
+  setQuestions: (questions: Question[]) => void;
   setWinningScore: (score: number) => void;
   setTeamName: (teamIndex: number, name: string) => void;
   addMember: (teamIndex: number, name: string) => void;
@@ -73,6 +79,15 @@ const initialState: GameState = {
 export const useGameStore = create<GameStore>((set, get) => ({
   ...initialState,
 
+  // Start with the bundled bank; replaced once OpenTDB questions load.
+  questionPool: QUESTIONS,
+
+  setQuestions: (questions) =>
+    set({
+      questionPool: questions.length > 0 ? questions : QUESTIONS,
+      usedQuestionIds: [],
+    }),
+
   setWinningScore: (score) =>
     set({ winningScore: Math.max(10, Math.round(score)) }),
 
@@ -118,11 +133,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   drawQuestion: () =>
     set((s) => {
-      const remaining = QUESTIONS.filter(
-        (q) => !s.usedQuestionIds.includes(q.id),
-      );
+      const bank = s.questionPool.length > 0 ? s.questionPool : QUESTIONS;
+      const remaining = bank.filter((q) => !s.usedQuestionIds.includes(q.id));
       // If the bank is exhausted, recycle (keeps a long party going).
-      const pool = remaining.length > 0 ? remaining : QUESTIONS;
+      const pool = remaining.length > 0 ? remaining : bank;
       const usedReset = remaining.length > 0 ? s.usedQuestionIds : [];
       const q = pool[Math.floor(Math.random() * pool.length)];
       return {
@@ -139,7 +153,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   confirmAnswer: () =>
     set((s) => {
-      const q = QUESTIONS.find((x) => x.id === s.currentQuestionId);
+      const q = s.questionPool.find((x) => x.id === s.currentQuestionId);
       if (!q || s.selectedChoiceIndex === null) return {};
 
       const correct = s.selectedChoiceIndex === q.correctIndex;
@@ -193,7 +207,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
   hydrate: (state) => set(state),
 
   getCurrentQuestion: () => {
-    const id = get().currentQuestionId;
-    return id ? QUESTIONS.find((q) => q.id === id) ?? null : null;
+    const { currentQuestionId, questionPool } = get();
+    return currentQuestionId
+      ? questionPool.find((q) => q.id === currentQuestionId) ?? null
+      : null;
   },
 }));
