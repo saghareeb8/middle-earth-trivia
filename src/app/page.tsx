@@ -1,12 +1,14 @@
-import { AnimatePresence, motion } from "framer-motion";
-import { useGameStore } from "./store/gameStore";
-import { HomeScreen } from "./screens/HomeScreen";
-import { SetupScreen } from "./screens/SetupScreen";
-import { GameScreen } from "./screens/GameScreen";
-import { VictoryScreen } from "./screens/VictoryScreen";
-import { MusicPlayer } from "./components/MusicPlayer";
+"use client";
 
-export default function App() {
+import { AnimatePresence, motion } from "framer-motion";
+import { useGameStore } from "../store/gameStore";
+import { HomeScreen } from "../screens/HomeScreen";
+import { SetupScreen } from "../screens/SetupScreen";
+import { GameScreen } from "../screens/GameScreen";
+import { VictoryScreen } from "../screens/VictoryScreen";
+import { MusicPlayer } from "../components/MusicPlayer";
+
+export default function Page() {
   const phase = useGameStore((s) => s.phase);
 
   return (

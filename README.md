@@ -1,70 +1,78 @@
-# Middle-earth Trivia
+# Middle-Earth Trivia
 
 A Lord of the Rings trivia party game, built as an installable **Progressive Web App**.
 Two teams race from **the Shire to Mount Doom** along a Middle-earth map — first to the
-winning score claims victory.
+winning score claims victory. Wrong answers send a team back a step.
 
-> **v1 (this build):** single shared screen, designed for a TV via HDMI. A moderator
-> runs the game; teams answer aloud and the moderator records each team's choice.
+> **v1:** single shared screen, designed for a TV via HDMI. A moderator runs the game;
+> teams answer aloud and the moderator records each team's choice. Built on a Next.js
+> server runtime so a multi-device hybrid (lobby join via code/QR) can be added later.
 
 ## Tech stack
 
-| Concern        | Choice                              |
-| -------------- | ----------------------------------- |
-| Framework      | React + TypeScript                  |
-| Build / dev    | Vite                                |
-| Styling        | Tailwind CSS v4 (custom LOTR theme) |
-| Animation      | Framer Motion (map markers, screens)|
-| State          | Zustand                             |
-| PWA / offline  | vite-plugin-pwa (Workbox)           |
-| Hosting        | Netlify (static `dist/`)            |
+| Concern        | Choice                                       |
+| -------------- | -------------------------------------------- |
+| Framework      | Next.js 14 (App Router) + React 18 + TS      |
+| Styling        | Tailwind CSS v4 (`@tailwindcss/postcss`)     |
+| Fonts          | `next/font/google` (Cinzel, EB Garamond, Uncial Antiqua) |
+| Animation      | Framer Motion (map markers, screen transitions) |
+| State          | Zustand (single `gameStore`)                 |
+| PWA / offline  | `@ducanh2912/next-pwa` (Workbox) + `manifest.webmanifest` |
+| Audio          | Native `<audio>` + YouTube IFrame embed      |
+| Hosting        | Vercel (zero-config) or Netlify (`@netlify/plugin-nextjs`) |
 
 ## Develop
 
 ```bash
 npm install
-npm run dev      # http://localhost:5173
-npm run build    # type-check + production build into dist/
-npm run preview  # preview the production build
+npm run dev      # http://localhost:3000
+npm run build    # production build (type-check + PWA service worker)
+npm run start    # run the production build locally
 ```
 
-## Deploy to Netlify
+## Project structure
 
-The repo includes `netlify.toml`, so no dashboard config is needed:
+```
+src/
+  app/
+    layout.tsx     # root layout: fonts, metadata, <html>/<body>
+    page.tsx       # "use client" phase switcher (home → setup → playing → victory)
+    globals.css    # Tailwind import + Middle-earth theme tokens
+  screens/         # HomeScreen, SetupScreen, GameScreen, VictoryScreen
+  components/       # MiddleEarthMap (SVG), MusicPlayer
+  store/gameStore.ts  # single source of truth (turns, scoring, step-back)
+  data/questions.ts   # the trivia bank
+  types.ts
+public/             # icons, favicon, manifest, music/
+```
 
-- **Build command:** `npm run build`
-- **Publish directory:** `dist`
+## Deploy
 
-Connect the repo in Netlify (or `netlify deploy --prod` with the CLI) and it ships.
-The SPA redirect rule is already set so refreshes resolve correctly.
+### Vercel (recommended for Next.js)
+Import the GitHub repo at vercel.com — it auto-detects Next.js, no config needed.
 
-## How a game flows
-
-1. **Home** → *Begin the Quest*.
-2. **Setup** → name both teams, add members, pick the score to win (default 100).
-3. **Play** (turn-based):
-   - It's a team's turn → *Reveal Question*.
-   - A multiple-choice question appears. The moderator taps the answer the team gave,
-     then *Locks In*.
-   - Correct answers award points (and occasionally **double points**), advancing the
-     team's marker along the map.
-   - Play passes to the next team.
-4. First team to the winning score → **Victory** screen.
+### Netlify
+`netlify.toml` sets the build command; Netlify auto-installs `@netlify/plugin-nextjs`
+to provide the Next.js server runtime. Connect the repo and deploy.
 
 ## Editing the question bank
 
-All questions live in [`src/data/questions.ts`](src/data/questions.ts) as a typed array.
-Each entry has a difficulty (`easy` / `medium` / `hard`), point value, prompt, choices,
-the correct index, and optional lore. Drop in your full LOTR set using the same shape.
+All questions live in [`src/data/questions.ts`](src/data/questions.ts) as a typed array
+(difficulty, points, prompt, choices, correct index, lore). Points per difficulty are in
+`POINTS_BY_DIFFICULTY`; the random double-points chance and the wrong-answer step-back
+penalty are constants in [`src/store/gameStore.ts`](src/store/gameStore.ts).
 
-Points per difficulty are set in `POINTS_BY_DIFFICULTY`; the random double-points chance
-is `DOUBLE_POINTS_CHANCE` in [`src/store/gameStore.ts`](src/store/gameStore.ts).
+## Background music
+
+Click the 🎵 control (bottom-right) and paste a **YouTube link** (plays via the official
+embedded player, kept visible per YouTube's ToS), or leave it blank to use a local file at
+`public/music/theme.mp3`. Do **not** ship the copyrighted official score — see
+[`public/music/README.md`](public/music/README.md) for royalty-free sources.
 
 ## Architecture note — built to grow into multi-device
 
 All game state lives in one Zustand store ([`src/store/gameStore.ts`](src/store/gameStore.ts))
-as plain, serialisable data, mutated only through actions. This is deliberate: the planned
-**hybrid mode** (players join a lobby via code/QR on their phones, while the moderator's
-device drives the TV) can be added by mirroring this store to a realtime backend
-(Firebase/Supabase) — pushing on each action and calling `hydrate()` on remote changes —
-**without rewriting the game logic or UI**.
+as plain, serialisable data, mutated only through actions. The planned **hybrid mode**
+(players join a lobby on their phones while the moderator's device drives the TV) can be
+added with the Next.js server runtime — API routes / realtime — plus mirroring this store,
+without rewriting the game logic or UI.

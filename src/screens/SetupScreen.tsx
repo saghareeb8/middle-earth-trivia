@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { useGameStore } from "../store/gameStore";
 import type { Team } from "../types";

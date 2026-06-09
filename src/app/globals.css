@@ -2,9 +2,10 @@
 
 /* ── Middle-earth theme tokens ───────────────────────────────────────── */
 @theme {
-  --font-display: "Cinzel", serif;
-  --font-body: "EB Garamond", "Georgia", serif;
-  --font-title: "Uncial Antiqua", "Cinzel", serif;
+  /* Font stacks resolve to the next/font CSS variables set on <html>. */
+  --font-display: var(--font-cinzel), "Cinzel", serif;
+  --font-body: var(--font-garamond), "EB Garamond", "Georgia", serif;
+  --font-title: var(--font-uncial), "Uncial Antiqua", "Cinzel", serif;
 
   /* Parchment & ink */
   --color-parchment: #e9d8b4;
@@ -29,8 +30,7 @@
 
 @layer base {
   html,
-  body,
-  #root {
+  body {
     height: 100%;
   }
 
