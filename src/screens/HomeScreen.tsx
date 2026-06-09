@@ -9,7 +9,7 @@ export function HomeScreen() {
         A Lord of the Rings Trivia Quest
       </p>
       <h1 className="text-gilded font-title text-5xl md:text-7xl leading-tight max-w-4xl">
-        Middle-earth Trivia
+        Middle-Earth Trivia
       </h1>
       <p className="mt-6 max-w-xl text-lg md:text-xl text-parchment/80 italic">
         Two fellowships. One road from the Shire to Mount Doom. Answer wisely —
