@@ -4,6 +4,7 @@
 @theme {
   --font-display: "Cinzel", serif;
   --font-body: "EB Garamond", "Georgia", serif;
+  --font-title: "Uncial Antiqua", "Cinzel", serif;
 
   /* Parchment & ink */
   --color-parchment: #e9d8b4;

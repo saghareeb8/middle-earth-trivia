@@ -8,7 +8,7 @@ export function HomeScreen() {
       <p className="font-display tracking-[0.35em] text-bronze text-sm md:text-base uppercase mb-4">
         A Lord of the Rings Trivia Quest
       </p>
-      <h1 className="text-gilded font-display font-black text-5xl md:text-7xl leading-tight max-w-4xl">
+      <h1 className="text-gilded font-title text-5xl md:text-7xl leading-tight max-w-4xl">
         Middle-earth Trivia
       </h1>
       <p className="mt-6 max-w-xl text-lg md:text-xl text-parchment/80 italic">
