@@ -2,6 +2,9 @@ import { create } from "zustand";
 import type { GameState, Question, Team } from "../types";
 import { QUESTIONS } from "../data/questions";
 
+/** Where the active question bank came from. */
+export type QuestionSource = "bundled" | "opentdb" | "fallback";
+
 // Chance (0..1) that a freshly drawn question is flagged for double points.
 const DOUBLE_POINTS_CHANCE = 0.2;
 
@@ -29,10 +32,12 @@ interface GameStore extends GameState {
   /** The active question bank. Loaded from OpenTDB at game start; falls back
    *  to the bundled set if the fetch fails (e.g. offline). */
   questionPool: Question[];
+  /** Where the active bank came from (drives the in-app source indicator). */
+  questionSource: QuestionSource;
 
   // ── Setup actions ──
   /** Replace the active question bank (and reset which have been used). */
-  setQuestions: (questions: Question[]) => void;
+  setQuestions: (questions: Question[], source: QuestionSource) => void;
   setWinningScore: (score: number) => void;
   setTeamName: (teamIndex: number, name: string) => void;
   addMember: (teamIndex: number, name: string) => void;
@@ -81,12 +86,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   // Start with the bundled bank; replaced once OpenTDB questions load.
   questionPool: QUESTIONS,
+  questionSource: "bundled",
 
-  setQuestions: (questions) =>
-    set({
-      questionPool: questions.length > 0 ? questions : QUESTIONS,
-      usedQuestionIds: [],
-    }),
+  setQuestions: (questions, source) =>
+    set(
+      questions.length > 0
+        ? { questionPool: questions, questionSource: source, usedQuestionIds: [] }
+        : { questionPool: QUESTIONS, questionSource: "bundled", usedQuestionIds: [] },
+    ),
 
   setWinningScore: (score) =>
     set({ winningScore: Math.max(10, Math.round(score)) }),

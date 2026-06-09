@@ -25,9 +25,18 @@ export function SetupScreen() {
     try {
       const res = await fetch("/api/questions?amount=30");
       const data = await res.json();
-      if (Array.isArray(data.questions)) setQuestions(data.questions);
-    } catch {
-      /* keep bundled fallback (already the default pool) */
+      if (Array.isArray(data.questions)) {
+        const source = data.source === "opentdb" ? "opentdb" : "fallback";
+        setQuestions(data.questions, source);
+        console.info(
+          `[questions] loaded ${data.questions.length} from "${source}"`,
+          data.error ? `(upstream error: ${data.error})` : "",
+        );
+      }
+    } catch (e) {
+      // Couldn't even reach our API route (fully offline) — keep bundled set.
+      setQuestions([], "bundled");
+      console.warn("[questions] fetch failed; using bundled set", e);
     } finally {
       setLoading(false);
       startGame();

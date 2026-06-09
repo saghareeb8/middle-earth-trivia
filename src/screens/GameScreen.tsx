@@ -18,9 +18,12 @@ export function GameScreen() {
     <main className="min-h-screen px-4 md:px-8 py-6 max-w-6xl mx-auto flex flex-col gap-6">
       {/* Top bar */}
       <div className="flex items-center justify-between gap-3">
-        <span className="font-display tracking-[0.25em] text-bronze text-xs md:text-sm uppercase">
-          Middle-earth Trivia
-        </span>
+        <div className="flex items-center gap-3 min-w-0">
+          <span className="font-display tracking-[0.25em] text-bronze text-xs md:text-sm uppercase">
+            Middle-earth Trivia
+          </span>
+          <SourceBadge />
+        </div>
         <RestartControl />
       </div>
 
@@ -63,6 +66,27 @@ function stageMotion(children: React.ReactNode) {
     >
       {children}
     </motion.div>
+  );
+}
+
+function SourceBadge() {
+  const source = useGameStore((s) => s.questionSource);
+  const live = source === "opentdb";
+  return (
+    <span
+      className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-bronze/50 px-2.5 py-0.5 text-[11px] tracking-wider text-parchment/60"
+      title={
+        live
+          ? "Questions are coming live from the Open Trivia Database"
+          : "Using the bundled question set (OpenTDB unavailable)"
+      }
+    >
+      <span
+        className={`w-2 h-2 rounded-full ${live ? "bg-green-400" : "bg-gold-bright"}`}
+        aria-hidden
+      />
+      {live ? "Open Trivia DB" : "Bundled set"}
+    </span>
   );
 }
 
